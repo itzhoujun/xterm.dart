@@ -288,7 +288,7 @@ mixin IndexedItem {
 
   /// The index of this item in the buffer. Must only be accessed when
   /// [attached] is true.
-  int get index => _absoluteIndex! - _owner!._absoluteStartIndex;
+  int get index => _absoluteIndex! - _owner!._startIndex;
 
   /// Whether this item is currently stored in a buffer.
   bool get attached => _owner != null;
