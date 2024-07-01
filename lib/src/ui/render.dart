@@ -389,7 +389,11 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
 
   double get _lineOffset {
     var charHeight = _painter.cellSize.height;
-    return -_scrollOffset + _padding.top - (charHeight - (_scrollOffset - _padding.top) % charHeight);
+    var remainder = (_scrollOffset - _padding.top) % charHeight;
+    if (remainder == 0) {
+      return _scrollOffset + _padding.top;
+    }
+    return -_scrollOffset + _padding.top - (charHeight - remainder);
   }
 
   /// The offset of the cursor from the top left corner of this render object.
