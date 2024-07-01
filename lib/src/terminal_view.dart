@@ -217,6 +217,9 @@ class TerminalViewState extends State<TerminalView> {
   @override
   Widget build(BuildContext context) {
     Widget child = Scrollable(
+      physics: AlwaysScrollableScrollPhysics(
+        parent: ClampingScrollPhysics(),
+      ),
       key: _scrollableKey,
       controller: _scrollController,
       viewportBuilder: (context, offset) {
