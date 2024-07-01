@@ -388,7 +388,8 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
   }
 
   double get _lineOffset {
-    return -_scrollOffset + _padding.top;
+    var charHeight = _painter.cellSize.height;
+    return -_scrollOffset + _padding.top - (charHeight - (_scrollOffset - _padding.top) % charHeight);
   }
 
   /// The offset of the cursor from the top left corner of this render object.
@@ -418,7 +419,7 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
     final firstLineOffset = _scrollOffset - _padding.top;
     final lastLineOffset = _scrollOffset + size.height + _padding.bottom;
 
-    final firstLine = firstLineOffset ~/ charHeight;
+    final firstLine = (firstLineOffset / charHeight).ceil();
     final lastLine = lastLineOffset ~/ charHeight;
 
     final effectFirstLine = firstLine.clamp(0, lines.length - 1);
