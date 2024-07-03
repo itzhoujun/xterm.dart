@@ -306,7 +306,7 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
   double startOffset = 0;
 
   void setStartOffset() {
-    startOffset = _offset.pixels;
+    startOffset = _offset.pixels + _lineHeightOffset;
   }
 
   /// Send a mouse event at [offset] with [button] being currently in [buttonState].
@@ -388,12 +388,12 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
   }
 
   double get _lineOffset {
-    var charHeight = _painter.cellSize.height;
-    var remainder = (_scrollOffset - _padding.top) % charHeight;
-    if (remainder == 0) {
-      return _scrollOffset + _padding.top;
-    }
-    return -_scrollOffset + _padding.top - (charHeight - remainder);
+    return -_scrollOffset + _padding.top - _lineHeightOffset;
+  }
+
+  double get _lineHeightOffset {
+    var remainder = (_scrollOffset - _padding.top) % lineHeight;
+    return remainder == 0 ? 0 : lineHeight - remainder;
   }
 
   /// The offset of the cursor from the top left corner of this render object.
