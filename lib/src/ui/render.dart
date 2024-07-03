@@ -287,7 +287,7 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
         _terminal.buffer.createAnchorFromOffset(fromPosition),
       );
     } else {
-      double dy = _padding.top;
+      double dy = 0;
       if (_scrollOffset != startOffset) {
         dy += startOffset - _scrollOffset;
       }
