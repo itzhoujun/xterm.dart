@@ -245,7 +245,7 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
   CellOffset getCellOffset(Offset offset) {
     final x = offset.dx - _padding.left;
     final y = offset.dy - _padding.top + _scrollOffset;
-    final row = y ~/ _painter.cellSize.height;
+    final row = (y / _painter.cellSize.height).round();
     final col = x ~/ _painter.cellSize.width;
     return CellOffset(
       col.clamp(0, _terminal.viewWidth - 1),
@@ -306,7 +306,7 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
   double startOffset = 0;
 
   void setStartOffset() {
-    startOffset = _offset.pixels + _lineHeightOffset;
+    startOffset = _offset.pixels;
   }
 
   /// Send a mouse event at [offset] with [button] being currently in [buttonState].
