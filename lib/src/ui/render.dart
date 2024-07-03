@@ -429,14 +429,6 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
     final effectFirstLine = firstLine.clamp(0, lines.length - 1);
     final effectLastLine = lastLine.clamp(0, lines.length - 1);
 
-    for (var i = effectFirstLine; i <= effectLastLine; i++) {
-      _painter.paintLine(
-        canvas,
-        offset.translate(0, (i * charHeight + _lineOffset).truncateToDouble()),
-        lines[i],
-      );
-    }
-
     if (_terminal.buffer.absoluteCursorY >= effectFirstLine &&
         _terminal.buffer.absoluteCursorY <= effectLastLine) {
       if (_isComposingText) {
@@ -451,6 +443,14 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
           hasFocus: _focusNode.hasFocus,
         );
       }
+    }
+
+    for (var i = effectFirstLine; i <= effectLastLine; i++) {
+      _painter.paintLine(
+        canvas,
+        offset.translate(0, (i * charHeight + _lineOffset).truncateToDouble()),
+        lines[i],
+      );
     }
 
     _paintHighlights(
