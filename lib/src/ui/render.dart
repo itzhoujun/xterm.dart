@@ -246,7 +246,7 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
     final x = offset.dx - _padding.left;
     final y = offset.dy - _padding.top + _scrollOffset;
     final row = (y / _painter.cellSize.height).round();
-    final col = x ~/ _painter.cellSize.width;
+    final col = (x / _painter.cellSize.width).round();
     return CellOffset(
       col.clamp(0, _terminal.viewWidth - 1),
       row.clamp(0, _terminal.buffer.lines.length - 1),
