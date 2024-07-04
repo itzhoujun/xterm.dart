@@ -217,7 +217,10 @@ class Buffer {
 
   void scrollUp(int lines) {
     for (var i = absoluteMarginTop; i <= absoluteMarginBottom; i++) {
-      if (i <= absoluteMarginBottom - lines) {
+      if (i < absoluteMarginTop + lines) {
+        this.lines[i] = this.lines[i + lines];
+      } else if (i <= absoluteMarginBottom - lines) {
+        this.lines.take(i);
         this.lines[i] = this.lines[i + lines];
       } else {
         this.lines[i] = _newEmptyLine();

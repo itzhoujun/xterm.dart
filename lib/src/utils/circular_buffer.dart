@@ -156,6 +156,14 @@ class IndexAwareCircularBuffer<T extends IndexedItem> {
     return result!;
   }
 
+  /// take element at index from the list, but not detach it
+  T? take(int index) {
+    int i =_getCyclicIndex(index);
+    T? data = _array[i];
+    _array[i] = null;
+    return data;
+  }
+
   /// Deletes [count] elements starting at [index], shifting all elements after
   /// [index] to the left.
   void remove(int index, [int count = 1]) {
