@@ -217,10 +217,10 @@ class Buffer {
 
   void scrollUp(int lines) {
     for (var i = absoluteMarginTop; i <= absoluteMarginBottom; i++) {
-      if (i < absoluteMarginTop + lines) {
-        this.lines[i] = this.lines[i + lines];
-      } else if (i <= absoluteMarginBottom - lines) {
-        this.lines.take(i);
+      if (i <= absoluteMarginBottom - lines) {
+        if (i >= absoluteMarginTop + lines) {
+          this.lines.take(i);
+        }
         this.lines[i] = this.lines[i + lines];
       } else {
         this.lines[i] = _newEmptyLine();
@@ -573,9 +573,7 @@ class Buffer {
         continue;
       }
       final line = lines[segment.line];
-      if (!(segment.line == range.begin.y ||
-          segment.line == 0 ||
-          line.isWrapped)) {
+      if (!(segment.line == range.begin.y || segment.line == 0 || line.isWrapped)) {
         builder.write("\n");
       }
       builder.write(line.getText(segment.start, segment.end));

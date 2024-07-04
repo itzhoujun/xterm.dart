@@ -51,6 +51,7 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
         );
 
   Terminal _terminal;
+
   set terminal(Terminal terminal) {
     if (_terminal == terminal) return;
     if (attached) _terminal.removeListener(_onTerminalChange);
@@ -61,6 +62,7 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
   }
 
   TerminalController _controller;
+
   set controller(TerminalController controller) {
     if (_controller == controller) return;
     if (attached) _controller.removeListener(_onControllerUpdate);
@@ -70,6 +72,7 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
   }
 
   ViewportOffset _offset;
+
   set offset(ViewportOffset value) {
     if (value == _offset) return;
     if (attached) _offset.removeListener(_onScroll);
@@ -79,6 +82,7 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
   }
 
   EdgeInsets _padding;
+
   set padding(EdgeInsets value) {
     if (value == _padding) return;
     _padding = value;
@@ -86,6 +90,7 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
   }
 
   bool _autoResize;
+
   set autoResize(bool value) {
     if (value == _autoResize) return;
     _autoResize = value;
@@ -111,6 +116,7 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
   }
 
   FocusNode _focusNode;
+
   set focusNode(FocusNode value) {
     if (value == _focusNode) return;
     if (attached) _focusNode.removeListener(_onFocusChange);
@@ -120,6 +126,7 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
   }
 
   TerminalCursorType _cursorType;
+
   set cursorType(TerminalCursorType value) {
     if (value == _cursorType) return;
     _cursorType = value;
@@ -127,6 +134,7 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
   }
 
   bool _alwaysShowCursor;
+
   set alwaysShowCursor(bool value) {
     if (value == _alwaysShowCursor) return;
     _alwaysShowCursor = value;
@@ -134,6 +142,7 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
   }
 
   EditableRectCallback? _onEditableRect;
+
   set onEditableRect(EditableRectCallback? value) {
     if (value == _onEditableRect) return;
     _onEditableRect = value;
@@ -141,6 +150,7 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
   }
 
   String? _composingText;
+
   set composingText(String? value) {
     if (value == _composingText) return;
     _composingText = value;
@@ -218,8 +228,7 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
   }
 
   /// Total height of the terminal in pixels. Includes scrollback buffer.
-  double get _terminalHeight =>
-      _terminal.buffer.lines.length * _painter.cellSize.height;
+  double get _terminalHeight => _terminal.buffer.lines.length * _painter.cellSize.height;
 
   /// The distance from the top of the terminal to the top of the viewport.
   // double get _scrollOffset => _offset.pixels;
@@ -244,13 +253,22 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
   /// Get the [CellOffset] of the cell that [offset] is in.
   CellOffset getCellOffset(Offset offset) {
     final x = offset.dx - _padding.left;
-    final y = offset.dy - _padding.top + _scrollOffset;
-    final row = (y / _painter.cellSize.height).round();
+    final y = offset.dy - _padding.top + _scrollOffset + _lineHeightOffset;
+    final row = _getRowFromY(y, lineHeight);
     final col = (x / _painter.cellSize.width).round();
     return CellOffset(
       col.clamp(0, _terminal.viewWidth - 1),
       row.clamp(0, _terminal.buffer.lines.length - 1),
     );
+  }
+
+  int _getRowFromY(double y, double height) {
+    int row = (y / height).floor();
+    double remainder = y % height;
+    if (remainder == 0) {
+      row -= 1;
+    }
+    return row;
   }
 
   /// Selects entire words in the terminal that contains [from] and [to].
@@ -287,7 +305,7 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
         _terminal.buffer.createAnchorFromOffset(fromPosition),
       );
     } else {
-      double dy = 0;
+      double dy = _padding.top;
       if (_scrollOffset != startOffset) {
         dy += startOffset - _scrollOffset;
       }
@@ -429,8 +447,7 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
     final effectFirstLine = firstLine.clamp(0, lines.length - 1);
     final effectLastLine = lastLine.clamp(0, lines.length - 1);
 
-    if (_terminal.buffer.absoluteCursorY >= effectFirstLine &&
-        _terminal.buffer.absoluteCursorY <= effectLastLine) {
+    if (_terminal.buffer.absoluteCursorY >= effectFirstLine && _terminal.buffer.absoluteCursorY <= effectLastLine) {
       if (_isComposingText) {
         _paintComposingText(canvas, offset + cursorOffset);
       }
@@ -533,9 +550,7 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
     for (var highlight in _controller.highlights) {
       final range = highlight.range?.normalized;
 
-      if (range == null ||
-          range.begin.y > lastLine ||
-          range.end.y < firstLine) {
+      if (range == null || range.begin.y > lastLine || range.end.y < firstLine) {
         continue;
       }
 
