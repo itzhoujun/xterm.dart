@@ -545,7 +545,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "909a11fa3320032219d0a7010e02d08944d53e53"
+      resolved-ref: b95a5423f2270c45e41e0c1a72ee8429a12a8eb0
       url: "https://github.com/itzhoujun/zmodem.git"
     source: git
     version: "0.0.6"
