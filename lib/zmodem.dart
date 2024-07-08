@@ -18,6 +18,8 @@ abstract class ZModemOffer {
   Stream<Uint8List> accept(int offset);
 
   void skip();
+
+  void abort();
 }
 
 class ZModemCallbackOffer implements ZModemOffer {
@@ -28,7 +30,9 @@ class ZModemCallbackOffer implements ZModemOffer {
 
   final void Function()? onSkip;
 
-  ZModemCallbackOffer(this.info, {required this.onAccept, this.onSkip});
+  final void Function()? onAbort;
+
+  ZModemCallbackOffer(this.info, {required this.onAccept, this.onSkip, this.onAbort});
 
   @override
   Stream<Uint8List> accept(int offset) {
@@ -38,6 +42,11 @@ class ZModemCallbackOffer implements ZModemOffer {
   @override
   void skip() {
     onSkip?.call();
+  }
+
+  @override
+  void abort() {
+    onAbort?.call();
   }
 }
 
@@ -145,6 +154,8 @@ class ZModemMux {
         await _handleZFileEndEvent(event);
       } else if (event is ZSessionFinishedEvent) {
         await _handleZSessionFinishedEvent(event);
+      }else if (event is ZSessionAbortedEvent) {
+        await _handleZSessionAbortedEvent(event);
       }
 
       /// remote is rz
@@ -181,6 +192,9 @@ class ZModemMux {
     await _closeReceiveSink();
   }
 
+  Future<void> _handleZSessionAbortedEvent(ZSessionAbortedEvent event) async {
+    await _reset();
+  }
   Future<void> _handleZSessionFinishedEvent(ZSessionFinishedEvent event) async {
     _flush();
     await _reset();
