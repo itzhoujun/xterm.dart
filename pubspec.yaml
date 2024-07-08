@@ -14,7 +14,9 @@ dependencies:
   equatable: ^2.0.3
   flutter:
     sdk: flutter
-  zmodem: ^0.0.6
+  zmodem:
+    git:
+      url: https://github.com/itzhoujun/zmodem.git
 
 dev_dependencies:
   flutter_test:
