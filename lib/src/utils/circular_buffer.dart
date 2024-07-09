@@ -118,6 +118,7 @@ class IndexAwareCircularBuffer<T extends IndexedItem> {
       _dropChild(i);
     }
     _startIndex = 0;
+    _absoluteStartIndex = 0;
     _length = 0;
   }
 
@@ -233,6 +234,7 @@ class IndexAwareCircularBuffer<T extends IndexedItem> {
   void trimStart(int count) {
     if (count > _length) count = _length;
     _startIndex += count;
+    _absoluteStartIndex += count;
     _startIndex %= _array.length;
     _length -= count;
   }
@@ -296,7 +298,7 @@ mixin IndexedItem {
 
   /// The index of this item in the buffer. Must only be accessed when
   /// [attached] is true.
-  int get index => _absoluteIndex! - _owner!._startIndex;
+  int get index => _absoluteIndex! - _owner!._absoluteStartIndex;
 
   /// Whether this item is currently stored in a buffer.
   bool get attached => _owner != null;
