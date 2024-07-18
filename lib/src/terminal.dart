@@ -1,6 +1,6 @@
 import 'dart:math' show max;
 
-import 'package:xterm/src/base/observable.dart';
+import 'package:flutter/widgets.dart';
 import 'package:xterm/src/core/buffer/buffer.dart';
 import 'package:xterm/src/core/buffer/cell_offset.dart';
 import 'package:xterm/src/core/buffer/line.dart';
@@ -25,7 +25,7 @@ import 'package:xterm/src/utils/circular_buffer.dart';
 /// [buffer] and events such as [onTitleChange] or [onBell], as well as
 /// translating user input into escape sequences that the application can
 /// understand.
-class Terminal with Observable implements TerminalState, EscapeHandler {
+class Terminal with ChangeNotifier implements TerminalState, EscapeHandler {
   /// The number of lines that the scrollback buffer can hold. If the buffer
   /// exceeds this size, the lines at the top of the buffer will be removed.
   final int maxLines;

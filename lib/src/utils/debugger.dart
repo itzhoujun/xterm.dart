@@ -1,7 +1,7 @@
+import 'package:flutter/widgets.dart';
 import 'package:xterm/src/core/escape/handler.dart';
 import 'package:xterm/src/core/escape/parser.dart';
 import 'package:xterm/src/core/mouse/mode.dart';
-import 'package:xterm/src/base/observable.dart';
 
 class TerminalCommand {
   TerminalCommand(
@@ -26,7 +26,7 @@ class TerminalCommand {
   final bool error;
 }
 
-class TerminalDebugger with Observable {
+class TerminalDebugger with ChangeNotifier {
   late final _parser = EscapeParser(_handler);
 
   late final _handler = _TerminalDebuggerHandler(recordCommand);
