@@ -426,6 +426,8 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
     return _painter.cellSize;
   }
 
+  bool cursorVisible = false;
+
   @override
   void paint(PaintingContext context, Offset offset) {
     _paint(context, offset);
@@ -451,7 +453,7 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
       if (_isComposingText) {
         _paintComposingText(canvas, offset + cursorOffset);
       }
-
+      cursorVisible = true;
       if (_shouldShowCursor) {
         _painter.paintCursor(
           canvas,
@@ -460,6 +462,8 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
           hasFocus: _focusNode.hasFocus,
         );
       }
+    } else{
+      cursorVisible = false;
     }
 
     for (var i = effectFirstLine; i <= effectLastLine; i++) {
