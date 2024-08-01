@@ -24,7 +24,6 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
     required Terminal terminal,
     required TerminalController controller,
     required ViewportOffset offset,
-    required EdgeInsets padding,
     required bool autoResize,
     required TerminalStyle textStyle,
     required TextScaler textScaler,
@@ -37,7 +36,6 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
   })  : _terminal = terminal,
         _controller = controller,
         _offset = offset,
-        _padding = padding,
         _autoResize = autoResize,
         _focusNode = focusNode,
         _cursorType = cursorType,
@@ -78,14 +76,6 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
     if (attached) _offset.removeListener(_onScroll);
     _offset = value;
     if (attached) _offset.addListener(_onScroll);
-    markNeedsLayout();
-  }
-
-  EdgeInsets _padding;
-
-  set padding(EdgeInsets value) {
-    if (value == _padding) return;
-    _padding = value;
     markNeedsLayout();
   }
 
@@ -247,13 +237,13 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
     final col = cellOffset.x;
     final x = col * _painter.cellSize.width;
     final y = row * _painter.cellSize.height;
-    return Offset(x + _padding.left, y + _padding.top - _scrollOffset);
+    return Offset(x, y - _scrollOffset);
   }
 
   /// Get the [CellOffset] of the cell that [offset] is in.
   CellOffset getCellOffset(Offset offset) {
-    final x = offset.dx - _padding.left;
-    final y = offset.dy - _padding.top + _scrollOffset + _lineHeightOffset;
+    final x = offset.dx;
+    final y = offset.dy + _scrollOffset + _lineHeightOffset;
     final row = _getRowFromY(y, lineHeight);
     final col = (x / _painter.cellSize.width).round();
     return CellOffset(
@@ -305,7 +295,7 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
         _terminal.buffer.createAnchorFromOffset(fromPosition),
       );
     } else {
-      double dy = _padding.top;
+      double dy = 0;
       if (_scrollOffset != startOffset) {
         dy += startOffset - _scrollOffset;
       }
@@ -398,7 +388,7 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
   }
 
   double get _viewportHeight {
-    return size.height - _padding.vertical;
+    return size.height;
   }
 
   double get _maxScrollExtent {
@@ -406,11 +396,11 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
   }
 
   double get _lineOffset {
-    return -_scrollOffset + _padding.top - _lineHeightOffset;
+    return -_scrollOffset - _lineHeightOffset;
   }
 
   double get _lineHeightOffset {
-    var remainder = (_scrollOffset - _padding.top) % lineHeight;
+    var remainder = _scrollOffset % lineHeight;
     return remainder == 0 ? 0 : lineHeight - remainder;
   }
 
@@ -440,14 +430,17 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
     final lines = _terminal.buffer.lines;
     final charHeight = _painter.cellSize.height;
 
-    final firstLineOffset = _scrollOffset - _padding.top;
-    final lastLineOffset = _scrollOffset + size.height + _padding.bottom;
+    final firstLineOffset = _scrollOffset;
+    final lastLineOffset = _scrollOffset + size.height;
 
     final firstLine = (firstLineOffset / charHeight).ceil();
     final lastLine = lastLineOffset ~/ charHeight;
 
-    final effectFirstLine = firstLine.clamp(0, lines.length - 1);
+    final lineSize = size.height ~/ charHeight;
+
+    // final effectFirstLine = firstLine.clamp(0, lines.length - 1);
     final effectLastLine = lastLine.clamp(0, lines.length - 1);
+    final effectFirstLine = (effectLastLine - lineSize).clamp(0, lines.length - 1);
 
     if (_terminal.buffer.absoluteCursorY >= effectFirstLine && _terminal.buffer.absoluteCursorY <= effectLastLine) {
       if (_isComposingText) {
@@ -467,6 +460,7 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
     }
 
     for (var i = effectFirstLine; i <= effectLastLine; i++) {
+      print("${(i * charHeight + _lineOffset).truncateToDouble()}");
       _painter.paintLine(
         canvas,
         offset.translate(0, (i * charHeight + _lineOffset).truncateToDouble()),
