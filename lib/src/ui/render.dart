@@ -431,16 +431,11 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
     final charHeight = _painter.cellSize.height;
 
     final firstLineOffset = _scrollOffset;
-    final lastLineOffset = _scrollOffset + size.height;
-
     final firstLine = (firstLineOffset / charHeight).ceil();
-    final lastLine = lastLineOffset ~/ charHeight;
-
     final lineSize = size.height ~/ charHeight;
 
-    // final effectFirstLine = firstLine.clamp(0, lines.length - 1);
-    final effectLastLine = lastLine.clamp(0, lines.length - 1);
-    final effectFirstLine = (effectLastLine - lineSize).clamp(0, lines.length - 1);
+    final effectFirstLine = firstLine.clamp(0, lines.length - 1);
+    final effectLastLine = (effectFirstLine + lineSize - 1).clamp(0, lines.length - 1);
 
     if (_terminal.buffer.absoluteCursorY >= effectFirstLine && _terminal.buffer.absoluteCursorY <= effectLastLine) {
       if (_isComposingText) {
@@ -460,7 +455,6 @@ class RenderTerminal extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
     }
 
     for (var i = effectFirstLine; i <= effectLastLine; i++) {
-      print("${(i * charHeight + _lineOffset).truncateToDouble()}");
       _painter.paintLine(
         canvas,
         offset.translate(0, (i * charHeight + _lineOffset).truncateToDouble()),
